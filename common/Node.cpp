@@ -1,6 +1,6 @@
 #include "Node.hpp"
 
-Node::Node(int id) : id_(id) {}
+Node::Node(int id) : id_(id), color_(-1) {}
 
 const int Node::get_id() const { return id_; }
 

@@ -1,5 +1,4 @@
 #include "Graph.hpp"
-#include <ostream>
 #include <random>
 
 Graph::Graph(int vertex_count) {
