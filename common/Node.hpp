@@ -40,6 +40,13 @@ public:
   const std::set<int> &get_neighbours() const;
 
   /**
+   * @brief Set the color of the node to a new value.
+   *
+   * @param color The new color of the node.
+   */
+  void set_color(int color);
+
+  /**
    * @brief Adds a neighbour to the node.
    *
    * @param node_id The ID of the neighbour to add.
