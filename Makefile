@@ -22,7 +22,7 @@ build_regular:
 run: run_distributed
 
 run_distributed: build_distributed
-	./build/distributed/distributed $(ARGS)
+	mpirun -np $(word 1, $(ARGS)) ./build/distributed/distributed $(wordlist 2, $(words $(ARGS)), $(ARGS))
 
 run_regular: build_regular
 	./build/regular/regular $(ARGS)
