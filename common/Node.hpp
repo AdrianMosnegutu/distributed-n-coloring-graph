@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ostream>
-#include <set>
+#include <unordered_set>
 
 /**
  * @brief Represents a node in an undirected graph.
@@ -37,7 +37,7 @@ public:
    * @return const std::unordered_set<int>& A const reference to the node's set
    * of neighbours.
    */
-  [[nodiscard]] const std::set<int> &get_neighbours() const;
+  [[nodiscard]] const std::unordered_set<int> &get_neighbours() const;
 
   /**
    * @brief Set the color of the node to a new value.
@@ -65,5 +65,5 @@ public:
 private:
   int id_;
   int color_;
-  std::set<int> neighbours_;
+  std::unordered_set<int> neighbours_;
 };

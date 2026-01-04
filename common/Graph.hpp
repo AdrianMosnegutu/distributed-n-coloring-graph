@@ -28,7 +28,23 @@ public:
    * @param seed An optional seed for random generation.
    * @return Graph A new random graph.
    */
-  static Graph random(const int vertex_count, const double density, const int seed = 0);
+  static Graph random_graph(const int vertex_count, const double density, const int seed = -1);
+
+  /**
+   * @brief Serializes the graph into a list of edges.
+   * @return A vector of integers representing pairs of connected vertices.
+   */
+  [[nodiscard]] std::vector<int> serialize() const;
+
+  /**
+   * @brief Deserializes a list of edges into a Graph object.
+   *
+   * @param vertex_count The total number of vertices in the graph.
+   * @param edge_list A vector of integers representing pairs of connected
+   * vertices.
+   * @return A new Graph object.
+   */
+  static Graph deserialize(int vertex_count, const std::vector<int> &edge_list);
 
   /**
    * @brief Get a reference to a node by its ID.

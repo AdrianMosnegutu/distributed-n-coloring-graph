@@ -1,4 +1,5 @@
 #include "Graph.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <iostream>
 #include <random>
@@ -11,18 +12,44 @@ Graph::Graph(int vertex_count) {
   }
 }
 
-Graph Graph::random(const int vertex_count, const double density, const int seed) {
-  std::mt19937 gen(seed);
+Graph Graph::random_graph(const int vertex_count, const double density, const int seed) {
+  std::mt19937 gen(seed == -1 ? std::random_device()() : seed);
   std::uniform_real_distribution<> dis(0.0, 1.0);
 
   Graph g(vertex_count);
+  const double clamped_density = std::clamp(density, 0.0, 1.0);
 
   for (int i = 0; i < vertex_count; ++i) {
     for (int j = i + 1; j < vertex_count; ++j) {
-      if (dis(gen) < density) {
+      if (dis(gen) < clamped_density) {
         g.add_edge(i, j);
       }
     }
+  }
+
+  return g;
+}
+
+std::vector<int> Graph::serialize() const {
+  std::vector<int> edge_list;
+
+  for (const auto &node : nodes_) {
+    for (const auto &neighbour_id : node.get_neighbours()) {
+      if (node.get_id() < neighbour_id) {
+        edge_list.push_back(node.get_id());
+        edge_list.push_back(neighbour_id);
+      }
+    }
+  }
+
+  return edge_list;
+}
+
+Graph Graph::deserialize(int vertex_count, const std::vector<int> &edge_list) {
+  Graph g(vertex_count);
+
+  for (size_t i = 0; i < edge_list.size(); i += 2) {
+    g.add_edge(edge_list[i], edge_list[i + 1]);
   }
 
   return g;
@@ -72,6 +99,7 @@ bool Graph::validate_coloring() const {
       }
     }
   }
+
   return true;
 }
 
@@ -79,8 +107,7 @@ std::ostream &operator<<(std::ostream &os, const Graph &g) {
   os << "graph {\n";
 
   for (const auto &node : g.nodes_) {
-    os << "  " << node.get_id() << " [label=\"" << node.get_id() << " ("
-       << node.get_color() << ")\"];\n";
+    os << node << '\n';
   }
 
   for (const auto &node : g.nodes_) {

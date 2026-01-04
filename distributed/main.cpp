@@ -1,13 +1,33 @@
 #include "../common/Graph.hpp"
 #include "algorithm.hpp"
+#include "config.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <mpi.h>
-#include <set>
 #include <stdexcept>
+#include <unordered_set>
 
-constexpr int N_COLORS = 10;
+Graph broadcast_graph(const int vertex_count, const double density, const int seed = -1) {
+  Graph g = Graph::random_graph(vertex_count, density, seed);
+  auto edge_list = g.serialize();
+  int edge_list_size = (int)edge_list.size();
+
+  MPI_Bcast(&edge_list_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(edge_list.data(), edge_list_size, MPI_INT, 0, MPI_COMM_WORLD);
+
+  return g;
+}
+
+Graph receive_graph(const int vertex_count) {
+  int edge_list_size;
+  MPI_Bcast(&edge_list_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  std::vector<int> edge_list(edge_list_size);
+  MPI_Bcast(edge_list.data(), edge_list_size, MPI_INT, 0, MPI_COMM_WORLD);
+
+  return Graph::deserialize(vertex_count, edge_list);
+}
 
 int main(int argc, char *argv[]) {
   MPI_Init(&argc, &argv);
@@ -16,29 +36,11 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-  Graph graph = Graph::random(20, 0.15, 42);
-
-  // Graph graph(10);
-  // graph.add_edge(0, 1);
-  // graph.add_edge(0, 2);
-  // graph.add_edge(1, 2);
-  // graph.add_edge(1, 3);
-  // graph.add_edge(2, 3);
-  // graph.add_edge(2, 4);
-  // graph.add_edge(3, 4);
-  // graph.add_edge(3, 5);
-  // graph.add_edge(4, 5);
-  // graph.add_edge(4, 6);
-  // graph.add_edge(5, 6);
-  // graph.add_edge(5, 7);
-  // graph.add_edge(6, 7);
-  // graph.add_edge(6, 8);
-  // graph.add_edge(7, 8);
-  // graph.add_edge(7, 9);
-  // graph.add_edge(8, 9);
+  Graph graph =
+      world_rank == 0 ? broadcast_graph(VERTEX_COUNT, EDGE_DENSITY) : receive_graph(VERTEX_COUNT);
 
   try {
-    run_parallel_coloring(graph, world_size, world_rank, N_COLORS);
+    run_parallel_coloring(graph, world_size, world_rank, COLORS);
   } catch (const std::runtime_error &e) {
     if (world_rank == 0) {
       std::cerr << "Error: " << e.what() << '\n';
@@ -61,7 +63,7 @@ int main(int argc, char *argv[]) {
       std::cerr << "Error: Unable to open graph.out for writing.\n";
     }
 
-    std::set<int> unique_colors;
+    std::unordered_set<int> unique_colors;
     for (const auto color : graph.get_colors()) {
       if (color != 0) {
         unique_colors.insert(color);

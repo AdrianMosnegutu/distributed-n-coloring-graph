@@ -6,7 +6,7 @@ const int Node::get_id() const { return id_; }
 
 const int Node::get_color() const { return color_; }
 
-const std::set<int> &Node::get_neighbours() const { return neighbours_; }
+const std::unordered_set<int> &Node::get_neighbours() const { return neighbours_; }
 
 void Node::set_color(int color) { color_ = color; }
 
