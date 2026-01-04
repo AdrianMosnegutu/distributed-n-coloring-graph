@@ -11,9 +11,8 @@ Graph::Graph(int vertex_count) {
   }
 }
 
-Graph Graph::random_graph(const int vertex_count, const double density) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
+Graph Graph::random(const int vertex_count, const double density, const int seed) {
+  std::mt19937 gen(seed);
   std::uniform_real_distribution<> dis(0.0, 1.0);
 
   Graph g(vertex_count);
@@ -33,7 +32,7 @@ Node &Graph::get_node(int node_id) { return nodes_[node_id]; }
 
 const Node &Graph::get_node(int node_id) const { return nodes_[node_id]; }
 
-int Graph::get_vertex_count() const { return nodes_.size(); }
+size_t Graph::get_vertex_count() const { return nodes_.size(); }
 
 std::vector<int> Graph::get_colors() const {
   std::vector<int> colors;
@@ -80,7 +79,8 @@ std::ostream &operator<<(std::ostream &os, const Graph &g) {
   os << "graph {\n";
 
   for (const auto &node : g.nodes_) {
-    os << node << '\n';
+    os << "  " << node.get_id() << " [label=\"" << node.get_id() << " ("
+       << node.get_color() << ")\"];\n";
   }
 
   for (const auto &node : g.nodes_) {

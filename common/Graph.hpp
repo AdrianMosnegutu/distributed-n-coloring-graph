@@ -25,9 +25,10 @@ public:
    *
    * @param vertex_count The number of vertices in the graph.
    * @param density The density of the graph, a value between 0 and 1.
+   * @param seed An optional seed for random generation.
    * @return Graph A new random graph.
    */
-  static Graph random_graph(const int vertex_count, const double density);
+  static Graph random(const int vertex_count, const double density, const int seed = 0);
 
   /**
    * @brief Get a reference to a node by its ID.
@@ -50,7 +51,7 @@ public:
    *
    * @return  The number of vertices.
    */
-  [[nodiscard]] int get_vertex_count() const;
+  [[nodiscard]] size_t get_vertex_count() const;
 
   /**
    * @brief Get the colors of all nodes in the graph.

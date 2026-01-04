@@ -34,29 +34,31 @@ TurnResult perform_coloring_turn(Graph &graph, const int world_rank, const int r
   if (world_rank == rank_turn) {
     for (int i = start_vertex; i < end_vertex; ++i) {
       auto &node = graph.get_node(i);
-      std::vector<bool> used_colors(n_colors + 1, false);
+      // Only attempt to color nodes that are not yet colored.
+      if (node.get_color() == 0) {
+        std::vector<bool> used_colors(n_colors + 1, false);
 
-      for (const auto &neighbour_id : node.get_neighbours()) {
-        const auto &neighbour = graph.get_node(neighbour_id);
-        if (neighbour.get_color() != 0) {
-          used_colors[neighbour.get_color()] = true;
+        for (const auto &neighbour_id : node.get_neighbours()) {
+          const auto &neighbour = graph.get_node(neighbour_id);
+          if (neighbour.get_color() != 0) {
+            used_colors[neighbour.get_color()] = true;
+          }
         }
-      }
 
-      int new_color = 0;
-      for (int c = 1; c <= n_colors; ++c) {
-        if (!used_colors[c]) {
-          new_color = c;
+        int new_color = 0;
+        for (int c = 1; c <= n_colors; ++c) {
+          if (!used_colors[c]) {
+            new_color = c;
+            break;
+          }
+        }
+
+        if (new_color == 0) {
+          // Failure condition: an uncolored node has no available colors.
+          local_failure = true;
           break;
         }
-      }
 
-      if (new_color == 0 && node.get_color() == 0) {
-        local_failure = true;
-        break;
-      }
-
-      if (new_color != 0 && new_color != node.get_color()) {
         node.set_color(new_color);
         local_changed = true;
       }
