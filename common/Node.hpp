@@ -22,14 +22,14 @@ public:
    *
    * @return const int The node's ID.
    */
-  const int get_id() const;
+  [[nodiscard]] const int get_id() const;
 
   /**
    * @brief Get the color of the node.
    *
    * @return const int The node's color.
    */
-  const int get_color() const;
+  [[nodiscard]] const int get_color() const;
 
   /**
    * @brief Get the set of neighbours of the node.
@@ -37,7 +37,7 @@ public:
    * @return const std::unordered_set<int>& A const reference to the node's set
    * of neighbours.
    */
-  const std::set<int> &get_neighbours() const;
+  [[nodiscard]] const std::set<int> &get_neighbours() const;
 
   /**
    * @brief Set the color of the node to a new value.
